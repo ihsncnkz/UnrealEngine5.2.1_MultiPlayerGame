@@ -24,6 +24,6 @@ void AMultiplayerCourseGameMode::JoinLANGame()
 	APlayerController* PC = GetGameInstance()->GetFirstLocalPlayerController();
 	if (PC)
 	{
-		PC->ClientTravel("YourIPAdress", TRAVEL_Absolute);
+		PC->ClientTravel("192.168.1.9", TRAVEL_Absolute);
 	}
 }

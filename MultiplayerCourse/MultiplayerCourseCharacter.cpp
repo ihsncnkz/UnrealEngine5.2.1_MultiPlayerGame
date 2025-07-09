@@ -9,6 +9,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/StaticMeshActor.h"
+#include "Kismet/GameplayStatics.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -65,6 +68,7 @@ void AMultiplayerCourseCharacter::BeginPlay()
 		}
 	}
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -125,5 +129,57 @@ void AMultiplayerCourseCharacter::Look(const FInputActionValue& Value)
 }
 
 
+void AMultiplayerCourseCharacter::ServerRPCFunction_Implementation(int MyArg)
+{
+	if (HasAuthority())
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, TEXT("Server: ServerRPCFunction_Implementatin"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("MyArgs: %d"), MyArg));
 
+		if (!SphereMesh)
+		{
+			return;
+		}
+
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = this;
+
+		AStaticMeshActor* StaticMeshActor = GetWorld()->SpawnActor<AStaticMeshActor>(SpawnParameters);
+		//StaticMeshActor->SetOwner();
+		if (StaticMeshActor)
+		{
+			StaticMeshActor->SetReplicates(true);
+			StaticMeshActor->SetReplicateMovement(true);
+			StaticMeshActor->SetMobility(EComponentMobility::Movable);
+			FVector SpawnLocaton = GetActorLocation() + GetActorRotation().Vector() * 100.f + GetActorUpVector() * 50.f;
+			StaticMeshActor->SetActorLocation(SpawnLocaton);
+			UStaticMeshComponent* StaticMeshComponent = StaticMeshActor->GetStaticMeshComponent();
+			if (StaticMeshComponent)
+			{
+				StaticMeshComponent->SetIsReplicated(true);
+				StaticMeshComponent->SetSimulatePhysics(true);
+				if (SphereMesh)
+				{
+					StaticMeshComponent->SetStaticMesh(SphereMesh);
+				}
+			}
+		}
+	}
+}
+
+bool AMultiplayerCourseCharacter::ServerRPCFunction_Validate(int MyArg)
+{
+	if (MyArg >= 0 && MyArg <= 100)
+	{
+		return true;
+	}
+	return false;
+}
+
+void AMultiplayerCourseCharacter::ClientRPCFunction_Implementation()
+{
+	FVector SpawnLocation = GetActorLocation();
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleEffect, SpawnLocation,
+		FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+}
 

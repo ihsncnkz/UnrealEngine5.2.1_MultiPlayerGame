@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Particles/ParticleSystem.h"
 #include "MyBox.generated.h"
 
 UCLASS()
@@ -23,8 +24,20 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(Replicated, BlueprintReadWrite)
+	UPROPERTY(ReplicatedUsing = OnRep_ReplicatedVar, BlueprintReadWrite)
 	float ReplicatedVar;
 
+	UFUNCTION(BlueprintCallable)
+	void OnRep_ReplicatedVar();
+
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void DecreaseReplicatedVar();
+	FTimerHandle TestTimer;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCExplode();
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ExplosionEffect;
 };
