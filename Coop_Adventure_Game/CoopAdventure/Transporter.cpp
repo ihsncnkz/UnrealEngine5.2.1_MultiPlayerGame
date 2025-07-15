@@ -21,6 +21,11 @@ void UTransporter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (OwnerIsTriggerActor)
+	{
+		TriggerActors.Add(GetOwner());
+	}
+
 	for (AActor* TA : TriggerActors)
 	{
 		APressurePlate* PressurePlateActor = Cast<APressurePlate>(TA);
@@ -42,7 +47,21 @@ void UTransporter::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		AllTriggerActorsTriggered = (ActivatedTriggerCount >= TriggerActors.Num());
 		if (AllTriggerActorsTriggered)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString("AllTriggersActorTriggered!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString("AllTriggersActorTriggered!"));
+		}
+	}
+
+	AActor* MyOwner = GetOwner();
+	if (MyOwner && MyOwner->HasAuthority() && ArePointsSet)
+	{
+		FVector CurrentLocation = MyOwner->GetActorLocation();
+		float Speed = FVector::Distance(StartPoint, EndPoint) / MoveTime;
+
+		FVector TargetLocation = AllTriggerActorsTriggered ? EndPoint : StartPoint;
+		if (!CurrentLocation.Equals(TargetLocation))
+		{
+			FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
+			MyOwner->SetActorLocation(NewLocation);
 		}
 	}
 }

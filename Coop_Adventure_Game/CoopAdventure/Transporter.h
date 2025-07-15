@@ -31,6 +31,9 @@ public:
 	float MoveTime;
 
 	UPROPERTY(EditAnywhere)
+	bool OwnerIsTriggerActor;
+
+	UPROPERTY(EditAnywhere)
 	TArray<AActor*> TriggerActors;
 
 	UPROPERTY(VisibleAnywhere)
@@ -39,7 +42,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool AllTriggerActorsTriggered;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetPoints(FVector Point1, FVector Point2);
 
 	UFUNCTION()
