@@ -29,6 +29,11 @@ ACollectableKey::ACollectableKey()
 	Mesh->SetIsReplicated(true);
 	Mesh->SetCollisionProfileName(FName("OverlapAllDynamic"));
 
+	CollectAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("CollectAudio"));
+	CollectAudio->SetupAttachment(RootComp);
+	CollectAudio->SetAutoActivate(false);
+
+	RotationSpeed = 100.f;
 }
 
 // Called when the game starts or when spawned
@@ -45,6 +50,8 @@ void ACollectableKey::Tick(float DeltaTime)
 
 	if (HasAuthority())
 	{
+		Mesh->AddRelativeRotation(FRotator(0.f, RotationSpeed * DeltaTime, 0.f));
+
 		TArray<AActor*> OverlapActors;
 		Capsule->GetOverlappingActors(OverlapActors, ACoopAdventureCharacter::StaticClass());
 
@@ -71,6 +78,10 @@ void ACollectableKey::OnRep_IsCollected()
 	if (HasAuthority())
 	{
 		UE_LOG(LogTemp, Display, TEXT("OnRep_IsCollected called from the server!"));
+		if (IsCollected)
+		{
+			OnCollected.Broadcast();
+		}
 	}
 	else
 	{
@@ -78,4 +89,14 @@ void ACollectableKey::OnRep_IsCollected()
 	}
 
 	Mesh->SetVisibility(!IsCollected);
+
+	CollectAudio->Play();
+
+	if (IsCollected)
+	{
+		if (KeyHolderRef)
+		{
+			KeyHolderRef->ActivateKeyMesh();
+		}
+	}
 }
