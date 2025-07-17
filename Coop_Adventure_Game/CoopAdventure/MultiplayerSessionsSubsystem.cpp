@@ -9,7 +9,7 @@ void PrintString(const FString& pString)
 {
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, pString);
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, pString);
 	}
 }
 
@@ -114,7 +114,7 @@ void UMultiplayerSessionsSubsystem::FindServer(FString ServerName)
 		IsLAN = true;
 	}
 	SessionSearch->bIsLanQuery = IsLAN;
-	SessionSearch->MaxSearchResults = 999;
+	SessionSearch->MaxSearchResults = 9999;
 	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 
 	ServerNameToFind = ServerName;
@@ -131,12 +131,15 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 
 	if (WasSuccessful)
 	{
-		FString Path = "/Game/ThirdPerson/Maps/ThirdPersonMap?listen";
+		//FString Path = "/Game/ThirdPerson/Maps/ThirdPersonMap?listen";
 
+		FString Path = "/Game/Stylized_Egypt/Maps/Stylized_Egypt_Demo?listen";
+		
+		/*
 		if (!GameMapPath.IsEmpty())
 		{
-			Path = FString::Printf(TEXT("%s?Listen"), *GameMapPath);
-		}
+			Path = FString::Printf(TEXT("%s?listen"), *GameMapPath);
+		}*/
 
 		GetWorld()->ServerTravel(Path);
 	}
@@ -160,7 +163,7 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool WasSuccessful)
 	if (ServerNameToFind.IsEmpty()) return;
 
 	TArray<FOnlineSessionSearchResult> Results = SessionSearch->SearchResults;
-	FOnlineSessionSearchResult* CurrectResult=0;
+	FOnlineSessionSearchResult* CurrectResult = 0;
 
 	if (Results.Num() > 0)
 	{

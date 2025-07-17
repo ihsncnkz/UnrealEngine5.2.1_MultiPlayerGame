@@ -88,7 +88,7 @@ void UTransporter::OnTriggerActorActivated()
 	ActivatedTriggerCount++;
 
 	FString Msg = FString::Printf(TEXT("Transporter Activede: %d"), ActivatedTriggerCount);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, Msg);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, Msg);
 }
 
 void UTransporter::OnTriggerActorDeactivated()
@@ -96,5 +96,5 @@ void UTransporter::OnTriggerActorDeactivated()
 	ActivatedTriggerCount--;
 
 	FString Msg = FString::Printf(TEXT("Transporter Activede: %d"), ActivatedTriggerCount);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, Msg);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, Msg);
 }
